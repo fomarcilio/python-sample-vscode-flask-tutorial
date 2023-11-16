@@ -40,14 +40,14 @@ steps:
     arguments: --world Venus
 
 - script: |
-    python -m pip install --upgrade pip setuptools wheel
+    python -m pip install --upgrade pip setuptools wheel flake8 pytest pytest-azurepipelines
+    pip install pytest-cov
     pip install -r requirements.txt
   displayName: 'Install dependencies'
 
 - script: |
-    python -m pip install flake8
-    flake8 .
-  displayName: 'Run lint test'
+    pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml
+  displayName: 'Run pytest'
 
 - script: |
     pip install pytest pytest-azurepipelines
