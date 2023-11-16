@@ -49,10 +49,5 @@ steps:
     pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml
   displayName: 'Run pytest'
 
-- task: PublishCodeCoverageResults@1
-  condition: succeededOrFailed()
-  inputs:
-    testResultsFiles: '**/test-*.xml'
-    testRunTitle: 'Publish test result for Python $(python.version)'
 
 
