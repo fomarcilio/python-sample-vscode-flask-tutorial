@@ -25,6 +25,20 @@ steps:
       print('Hello world 1')
       print('Hello world 2')
 
+- task: PythonScript@0
+  inputs:
+    scriptSource: inline
+    script: |
+      import sys
+      print('A execução do script é:', str(sys.argv[0]))
+      print('O argumento é:', str(sys.argv))
+      import argparse
+      parser = argparse.ArgumentParser()
+      parser.add_argument("--world", help="Forneça o nome do mundo para dar oi.")
+      args = parser.parse_args()
+      print('Hello', args.world)
+    arguments: --world Venus
+
 - script: |
     python -m pip install --upgrade pip
     pip install -r requirements.txt
