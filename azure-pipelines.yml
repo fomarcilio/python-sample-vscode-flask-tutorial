@@ -3,6 +3,10 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
+  
+variables:
+  imageName: 'azure-devops-CI-pipeline'
+
 strategy:
   matrix:
     Python38:
@@ -24,6 +28,14 @@ steps:
     script: |
       print('Hello world 1')
       print('Hello world 2')
+
+- task: Docker@2
+  displayName: Build an image
+  inputs:
+    repository: $(imageName)
+    command: build
+    Dockerfile: app/Dockerfile
+
 
 - task: PythonScript@0
   inputs:
