@@ -34,7 +34,7 @@ steps:
   inputs:
     repository: $(imageName)
     command: build
-    Dockerfile: app/Dockerfile
+    Dockerfile: Dockerfile
 
 
 - task: PythonScript@0
