@@ -6,34 +6,51 @@ pool:
   
 variables:
   imageName: 'azure-devops-CI-pipeline'
+  k8sNamespace: 'seu-namespace'
+  k8sSecretName: 'seu-secret-name'
 
-strategy:
-  matrix:
-    Python310:
-      python.version: '3.10'
+jobs:
+- job: Build
+  displayName: 'Build and Test'
+  strategy:
+    matrix:
+      Python310:
+        python.version: '3.10'
+  steps:
+  - task: UsePythonVersion@0
+    inputs:
+      versionSpec: '$(python.version)'
+    displayName: 'Use Python $(python.version)'
 
-steps:
-- task: UsePythonVersion@0
-  inputs:
-    versionSpec: '$(python.version)'
-  displayName: 'Use Python $(python.version)'
+  - task: Docker@2
+    displayName: 'Build Docker Image'
+    inputs:
+      repository: $(imageName)
+      command: build
+      Dockerfile: Dockerfile
 
-- task: Docker@2
-  displayName: Build an image
-  inputs:
-    repository: $(imageName)
-    command: build
-    Dockerfile: Dockerfile
+  - script: |
+      python -m pip install --upgrade pip setuptools wheel flake8 pytest pytest-azurepipelines
+      pip install pytest-cov
+      pip install -r requirements.txt
+    displayName: 'Install Dependencies'
 
-- script: |
-    python -m pip install --upgrade pip setuptools wheel flake8 pytest pytest-azurepipelines
-    pip install pytest-cov
-    pip install -r requirements.txt
-  displayName: 'Install dependencies'
+  - script: |
+      pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml
+    displayName: 'Run pytest'
 
-- script: |
-    pytest --doctest-modules --junitxml=junit/test-results.xml --cov=. --cov-report=xml
-  displayName: 'Run pytest'
+- job: Deploy
+  displayName: 'Deploy to Kubernetes'
+  dependsOn: Build
+  condition: succeeded()
+  steps:
+  - script: echo 'Deploying to Kubernetes...'
+    displayName: 'Deployment Step'
 
-
+  - task: KubernetesManifest@0
+    inputs:
+      action: 'deploy'
+      #kubernetesServiceEndpoint: 
+      namespace: $(k8sNamespace)
+      manifests: 'kube-manifests/01-Deplyment-and-LoadBalancer-Service.yml'
 
