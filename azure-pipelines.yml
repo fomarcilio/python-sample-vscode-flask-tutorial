@@ -47,10 +47,10 @@ jobs:
   - script: echo 'Deploying to Kubernetes...'
     displayName: 'Deployment Step'
 
-  - task: KubernetesManifest@0
-    inputs:
-      action: 'deploy'
+  #- task: KubernetesManifest@0
+    #inputs:
+      #action: 'deploy'
       #kubernetesServiceEndpoint: 
-      namespace: $(k8sNamespace)
-      manifests: 'kube-manifests/01-Deplyment-and-LoadBalancer-Service.yml'
+      #namespace: $(k8sNamespace)
+      #manifests: 'kube-manifests/01-Deplyment-and-LoadBalancer-Service.yml'
 
